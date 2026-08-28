@@ -1,0 +1,33 @@
+schema: spec-driven
+
+# Project context — shown to the AI when creating artifacts.
+context: |
+  cert-manager-webhook-vkcloud: a cert-manager ACME DNS01 webhook-solver
+  for VK Cloud / mcs.mail.ru public DNS API v2. Written in Go.
+  Apache-2.0. Deployed as a Kubernetes webhook via a Helm chart.
+  CI/CD: GitHub Actions, Docker image published to ghcr.io.
+
+  Conventions:
+  - Go modules; keep go.mod / Dockerfile / CI Go version in sync.
+  - Structured logging (slog or zap), never fmt.Println in production code.
+  - Configuration surfaced via cert-manager issuer JSON -> vkcloud.Config.
+  - Credentials come from Kubernetes Secrets (SecretKeySelector refs).
+  - Specs in openspec/specs/ are the source of truth for behavior.
+  - Future changes must be proposed as OpenSpec deltas against the baseline.
+
+# Per-artifact rules
+rules:
+  proposal:
+    - Keep proposals under 500 words
+    - Always include a "Non-goals" section
+    - Mark breaking changes with **BREAKING**
+  specs:
+    - Use SHALL/MUST for normative requirements
+    - Every requirement MUST have at least one scenario
+    - Scenarios use exactly 4 hashtags (####)
+  design:
+    - List key decisions with rationale and alternatives considered
+    - Call out risks / trade-offs explicitly
+  tasks:
+    - Break tasks into chunks of max 2 hours
+    - Each task MUST state how to verify completion
