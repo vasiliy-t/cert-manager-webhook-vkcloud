@@ -20,10 +20,10 @@ openspec-archive-change       -> merges deltas into openspec/specs/
 |-------------------------|------------------------------------------------------------|--------------|
 | `acme-solver`           | ACME DNS01 solver behavior (Present/CleanUp/Initialize)    | 7            |
 | `vkcloud-dns-client`    | VK Cloud public-dns API v2 integration                     | 7            |
-| `kubernetes-deployment` | Helm chart, RBAC, Service, APIService, PKI                 | 6            |
-| `ci-cd`                 | GitHub Actions pipeline, Docker build, ghcr.io publishing  | 6            |
+| `kubernetes-deployment` | Helm chart, RBAC, Service, APIService, PKI                 | 9            |
+| `ci-cd`                 | GitHub Actions pipeline, Docker build, ghcr.io publishing  | 7            |
 
-**Total: 26 requirements across 4 capabilities.**
+**Total: 30 requirements across 4 capabilities.**
 
 ## How to use
 

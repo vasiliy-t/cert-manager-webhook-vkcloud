@@ -1,5 +1,4 @@
 ## Purpose
-
 Defines the ACME DNS01 solver behavior of the webhook: how it presents and cleans up ACME challenges for the VK Cloud DNS provider, the solver name it registers under, and the configuration surface exposed to cert-manager.
 
 ## ADDED Requirements
@@ -15,13 +14,20 @@ The webhook SHALL register itself with cert-manager under the solver name `vkclo
 
 ### Requirement: Present creates a TXT record for the challenge
 
-When cert-manager invokes the `Present` method with a `ChallengeRequest`, the solver SHALL create a TXT record in the target DNS zone containing the ACME challenge key. The record's host name SHALL be derived from the `ResolvedFQDN` and `ResolvedZone` fields of the request.
+When cert-manager invokes the `Present` method with a `ChallengeRequest`, the solver SHALL create a TXT record in the target DNS zone containing the ACME challenge key. The record's host name SHALL be derived from the `ResolvedFQDN` and `ResolvedZone` fields of the request as follows: the trailing dot is stripped from `ResolvedFQDN`; then, if the resulting name contains the substring `"." + ResolvedZone` (with `ResolvedZone` taken verbatim, including any trailing dot), the name is truncated at that substring; otherwise the full un-dotted FQDN is used as the record name.
+
+Note (current-state caveat): cert-manager passes `ResolvedZone` in FQDN form with a trailing dot (e.g. `example.com.`). In that case the substring `.example.com.` does not occur in the un-dotted FQDN (`_acme-challenge.example.com`), so the zone suffix is NOT stripped and the record name submitted to the API is the full FQDN without the trailing dot. Whether this yields a correct DNS record depends on the VK Cloud API's normalization behavior. This is a documented current behavior, not a design intent; it is a candidate for a unit test and a fix in a future change.
 
 #### Scenario: Successful challenge presentation
 
 - **WHEN** cert-manager calls `Present` with a valid `ChallengeRequest` whose `ResolvedZone` exists in the VK Cloud DNS provider
 - **THEN** the solver creates a TXT record with the challenge key in that zone
-- **AND** the record's host name is the FQDN with the zone suffix stripped
+- **AND** the record's host name is derived per the rule above (zone suffix stripped only when the verbatim `ResolvedZone` substring matches)
+
+#### Scenario: Zone suffix does not match due to trailing dot
+
+- **WHEN** cert-manager calls `Present` with `ResolvedFQDN` = `_acme-challenge.example.com.` and `ResolvedZone` = `example.com.` (trailing dot, as cert-manager provides it)
+- **THEN** the record name submitted to the VK Cloud API is `_acme-challenge.example.com` (full name, suffix not stripped)
 
 #### Scenario: Zone does not exist
 
